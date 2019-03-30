@@ -1,7 +1,5 @@
 """
 Chapter One - Arrays and Strings
-
-Interview Questions
 """
 
 
