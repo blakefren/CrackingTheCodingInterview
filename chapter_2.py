@@ -2,7 +2,7 @@
 Chapter Two - Linked Lists
 """
 
-# Creating a simple node class to be used in examples.
+# Creating a simple node class.
 class Node:
     def __init__(self, data):
         self.data = data
