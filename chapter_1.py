@@ -174,6 +174,7 @@ def one_five(str_one, str_two):
 
 # 1.6
 # Perform string compression using counts of repeated characters.
+# If compressed string is longer than original, return original.
 # Ex.: 'aabcccccaaa' -> a2b1c5a3
 # 
 # This method has O(N) runtime, where N=len(input_str).

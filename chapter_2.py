@@ -229,32 +229,88 @@ def two_six(head):
     n_1 = head
     n_2 = n_2_head
     while n_1 is not None:  # O(N) loop.
-        print(n_1.data, n_2.data)
         if n_1.data != n_2.data:
             return False
         n_1 = n_1.next
         n_2 = n_2.next
     
     return True
-    
-    
-    
-a = llist_from_list([1,2,3,4,5,6,7,8,7,5,6,3,9])
-print(two_six(a))
 
 
 # 2.7
-# Description
+# Determine if two singly linked lists intersect, and if so return the intersection node.
+# Intersection is defined by entire node, not value.
 #
-# This method has O(____) runtime, where N=____.
+# This method has O(N+M) runtime, where N=num nodes in ll_1 and M=num nodes in ll_2.
 
-def two_seven():
-    pass
+def two_seven(ll_1, ll_2):
+    
+    n_1 = ll_1
+    n_1_length = 0
+    while n_1 is not None:  # O(N) loop, where N=num nodes in ll_1.
+        if n_1.next is not None:
+            n_1 = n_1.next
+            n_1_length += 1
+        else:
+            break
+        
+    n_2 = ll_2
+    n_2_length = 0
+    while n_2 is not None:  # O(M) loop, where M=num nodes in ll_2.
+        if n_2.next is not None:
+            n_2 = n_2.next
+            n_2_length += 1
+        else:
+            break
+    
+    # Check if the lists are linked by last node.
+    if n_1 is not n_2:
+        return None
+    
+    # Get 
+    len_diff = abs(n_1_length - n_2_length)
+    if n_1_length >= n_2_length:
+        n_1 = ll_1
+        n_2 = ll_2
+    else:
+        n_1 = ll_2
+        n_2 = ll_1
+    
+    # Advance the larger list by len_diff.
+    for i in range(len_diff):
+        n_1 = n_1.next
+    
+    # Check node by node until we find the match.
+    while n_1 is not None:
+        if n_1 == n_2:
+            return n_1
+        else:
+            n_1 = n_1.next
+            n_2 = n_2.next
+
 
 # 2.8
-# Description
+# Determine if a linked list has a loop, and if so return the node at the start of the loop.
 #
-# This method has O(____) runtime, where N=____.
+# This method has O(N) runtime, where N=num nodes in ll.
 
-def two_eight():
-    pass
+def two_eight(ll):
+    
+    n_1 = ll
+    n_2 = ll
+    
+    while n_1 is not None and n_2 is not None:  # O(N) loop.
+        n_1 = n_1.next.next
+        n_2 = n_2.next
+        if n_1 == n_2:
+            break
+    
+    if n_1 is None:
+        return None
+    
+    n_1 = ll
+    while n_1 is not n_2:  # O(N) loop (max).
+        n_1 = n_1.next
+        n_2 = n_2.next
+    
+    return n_1
