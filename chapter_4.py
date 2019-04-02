@@ -351,7 +351,7 @@ def four_eight(a, b):
 # been used to build the tree. The arrays were used to build the tree by
 # inserting values from left to right.
 #  
-# This method has O(____) runtime where N=num nodes in tree.
+# This method has O(N^3+) runtime where N=num nodes in tree.
 
 def four_nine(root):
     
@@ -365,12 +365,6 @@ def four_nine(root):
         
         if node is None:
             return deque([])  # Return an empty queue in a list to force one loop for permutations.
-        
-        '''
-        # If no child nodes, then this node is the only value.
-        if node.left is None and node.right is None:
-            return current_value
-        '''
         
         # Get all options from left and right nodes, then make permutations and return.
         return_queue = deque()  # Will be a queue of queues.
