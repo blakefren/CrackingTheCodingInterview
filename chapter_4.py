@@ -2,27 +2,54 @@
 Chapter Four - Trees and Graphs
 """
 
-from collections import dequeue  # For BFS.
+from collections import deque  # For BFS.
 
 
-# Create graph class for use in problems.
+# Pseudo graph class.
 class Graph:
     
     def __init__(self):
+        self.nodes = {}
+        self.edges = {}  # Dict of lists for each node.
+        self.reverse_edges = {}  # Dict of lists for each node.
         pass
     
     def add_node(self, node):
-        # Adds a node to the graph.
+        # Adds a node to the graph in self.nodes.
         pass
+    
+    def add_edge(self, node_1, node_2):
+        # Adds an edge to the graph from node_1 to node_2 in self.edges.
+        # If node_1 or node_2 do not exist, create them and add to self.nodes.
+        # Updates each node's adjacent and reverse_adjacent dicts as needed.
+        pass
+    
+    def remove_node(self, node):
+        # Removes a node, its edges, and its reverse edges.
+        if node in self.nodes:
+            del self.nodes[node]
+        self.remove_nodes(node)
+    
+    def remove_edge(self, node_1, node_2):
+        # Removes the edge and the reverse edge between node_1 and node_2.
+        pass
+    
+    def remove_edges(self, node):  # O(1) with dicts.
+        # Removes all edges and reverse edges for a single node.
+        if node in self.edges:
+            del self.edges[node]
+        if node in self.reverse_edges:
+            del self.reverse_edges[node]
 
-# Create a node class.
+# Pseudo node class.
 class Node:
     
     def __init__(self, value):
         self.value = value
         self.left = None  # For use in binary trees only.
         self.right = None  # For use in binary trees only.
-        pass
+        self.adjacent = {}  # All downstream directed adjacent nodes.
+        self.reverse_adjacent = {}  # All upstream directed adjacent nodes.
     
     def get_adjacent(self):
         # Return list of all adjacent nodes.
@@ -50,7 +77,7 @@ def four_one(graph, S, E):
     # We will do a BFS from S to find a path to E.
     if S == E:
         return True
-    queue = dequeue()
+    queue = deque()
     queue.append(S)
     visited = {S: True}
     
@@ -165,76 +192,226 @@ def four_four(root):
 # 4.5
 # Check if a binary tree is a binary search tree.
 # BST Definition: left node <= current node < right node, and
-# that all left nodes must be less than all right nodes.
+# all left nodes must be less than all right nodes.
 # 
-# This method has O(N) runtime where N=num nodes in tree.
+# This method has worst-case O(N) runtime where N=num nodes in tree.
 
-
-### INCOMPLETE
-# I forgot the second BST requirement (above).
+import sys
 
 def four_five(root):
     
-    def BST_check(node):
+    def BST_check(node, min, max):
         
         if node.left is None and node.right is None:  # Leaf node; always valid BST.
             return True
         
         elif node.left is None:  # No left node.
-            if node.right.value <= node.value:  # Not a BST.
+            if node.value < node.right.value <= max:   # Check right node.
+                return BST_check(node.right, node.value, max)
+            else:  # Not a BST.
                 return False
-            else:
-                return BST_check(node.right)  # Check right node.
         
         elif node.right is None:  # No right node.
-            if node.left.value > node.value:  # Not a BST.
+            if min <= node.left.value <= node.value:   # Check left node.
+                return BST_check(node.left, min, node.value) 
+            else:  # Not a BST.
                 return False
-            else:
-                return BST_check(node.left)    # Check left node.
         
         else:  # Both nodes are valid.
-            if node.left.value <= node.value and node.right.value > node.value:  # Valid BST.
-                return min(BST_check(node.left), BST_check(node.right))
-            else:
+            if (min <= node.left.value <= node.value) and (node.value < node.right.value <= max):  # Valid BST.
+                return min(BST_check(node.left, min, node.value), BST_check(node.right, node.value, max))
+            else:  # Not a BST.
                 return False
-        
-    return BST_check(root)
+    
+    return BST_check(root, -sys.maxsize, sys.maxsize)  # Set initial bounds as max and min system value.
 
 
 # 4.6
-# Description
+# Find the next node (in-order successor) of a given node in a binary search tree.
+# Assume that each node has a link to its parent (let's say it's node.parent).
+# In-order: left, current, right.
 # 
-# This method has O(____) runtime where N=____.
+# This method has O(N) runtime where N=num nodes in tree.
 
-def four_six():
-    pass
+def four_six(node):
+    
+    if node = None:
+        return None
+    
+    # Return the leftmost node in the right tree if the right node exists.
+    if node.right:
+        n_c = node.right
+        while n_c.left:
+            n_c = n_c.left
+        return n_c
+    
+    # Since our node is the right node of the parent, then we need to go up
+    # the chain until a parent is the left node of its parent.
+    n_p = parent
+    current = node
+    while n_p and current != n_p.left:
+        current = n_p
+        n_p = n_p.parent
+    return n_p
 
 
 # 4.7
-# Description
+# Given a list of projects and dependencies (other projects), find the order the
+# projects must be built in. All of a project's dependencies must be built before
+# the project. The dependency list is a list of project pairs, where the second
+# project is dependent on the first.
+# Return an error if there is no valid build order.
 # 
-# This method has O(____) runtime where N=____.
+# This method has O(M+N^2) runtime where N=num projects and M=num dependencies.
+# The book solution's runtime is incorrect; it should be the same as mine.
 
-def four_seven():
-    pass
+def four_seven(projects, dependencies):
+    
+    # Assume projects is a list, and dependencies is a list of tuples.
+    # Build a graph of all projects (nodes) and dependencies (edges).
+    
+    g = Graph()
+    queue = deque()
+    
+    for p in projects:  # O(N) loop.
+        g.add_node(p)
+        queue.append(p)
+    
+    for d in dependencies:  # O(M) loop.
+        g.add_edge(d[0], d[1])
+    
+    order = []
+    
+    # Get all nodes that have no dependencies.
+    # If no dependencies, add to order list and remove edges from graph.
+    # Repeat until we've found all the nodes.
+    loop_count = 0
+    while queue:  # O(N) loop.
+    
+        n = queue.popleft()
+        
+        if n not in g.reverse_edges:
+        
+            order.append(n.value)
+            g.remove_edges(n)  # O(1) removal.
+            loop_count = 0
+        
+        else:
+        
+            queue.append(n)
+            loop_count += 1
+            
+            # If we've found this many nodes with dependencies
+            # in a row, then we have a circular loop in our graph.
+            if loop_count >= len(projects):
+                return None
+    
+    return order
 
 
 # 4.8
-# Description
+# Find the first common ancestor of two nodes in a binary tree (not a BST).
+# Do not store additional nodes in a data structure.
 # 
-# This method has O(____) runtime where N=____.
+# This method has O(N) runtime where N=depth of the deeper node.
 
-def four_eight():
-    pass
+def four_eight(a, b):
+    
+    # Get depths of a and b nodes, and find the deeper node.
+    d_a = get_depth(a)
+    d_b = get_depth(b)
+    depth_diff = d_a - d_b
+    deep = a if depth_diff > 0 else b
+    shallow = b if depth_diff > 0 else a
+    
+    # Bring the deeper node to the height of the other.
+    while depth_diff != 0:
+        deep = deep.parent
+        depth_diff -= 1
+    
+    while deep != shallow and deep and shallow:
+        deep = deep.parent
+        shallow = shallow.parent
+    
+    if deep and shallow:
+        return deep
+    else:
+        return None
+    
+    def get_depth(node):
+        depth = 0
+        while node:
+            node = node.parent
+            depth += 1
+        return depth
 
 
 # 4.9
-# Description
-# 
-# This method has O(____) runtime where N=____.
+# Given a BST with distinct elements, return all possible arrays that could have
+# been used to build the tree. The arrays were used to build the tree by
+# inserting values from left to right.
+#  
+# This method has O(____) runtime where N=num nodes in tree.
 
-def four_nine():
-    pass
+def four_nine(root):
+    
+    # Using a recursive solution (with DFS).
+    # Need each subtree to return a list of lists of the arrays that could have built it.
+    # Need to combine the list of lists from the left and right subtree for each node while maintaining order for each of the respective array options.
+    # For each node, the first array item (prefix) is always that node.
+    # I'm using a deque because it gives O(1) for pop/append for front and back.
+    
+    def get_array(node):  # Should run N times (that actually do something).
+        
+        if node is None:
+            return deque([])  # Return an empty queue in a list to force one loop for permutations.
+        
+        '''
+        # If no child nodes, then this node is the only value.
+        if node.left is None and node.right is None:
+            return current_value
+        '''
+        
+        # Get all options from left and right nodes, then make permutations and return.
+        return_queue = deque()  # Will be a queue of queues.
+        q_1 = get_array(node.left)
+        q_2 = get_array(node.right)
+        
+        while q_1:  # O(N) loop.
+        
+            q_1_sub = q_1.popleft()
+            for q_2:  # O(N) loop.
+                
+                q_2_sub = q_2.popleft()
+                return_queue.extend(get_ordered_permutations(deque(node.value), q_1_sub, q_2_sub))
+        
+        return return_queue
+        
+        
+    def get_ordered_permutations(prefix, q_1, q_2):  # Return a queue of queues of ordered permutations.
+        
+        return_queue = deque()
+        
+        if len(q_1) == 0:
+            return_queue.extend([prefix + q for q in q_2])
+            
+        elif len(q_2) == 0:
+            return_queue.extend([prefix + q for q in q_1])
+        
+        else:
+            # Starting with left node.
+            prefix.append(q_1.popleft())
+            return_queue.extend(get_ordered_permutations(prefix, q_1, q_2))
+            q_1.appendleft(prefix.pop())
+            
+            # Starting with right node.
+            prefix.append(q_2.pop())
+            return_queue.extend(get_ordered_permutations(prefix, lst_1, q_2))
+            q_2.appendleft(prefix.pop())
+        
+        return return_queue
+    
+    return get_array(root)
 
 
 # 4.10
