@@ -409,27 +409,196 @@ def four_nine(root):
 
 
 # 4.10
-# Description
+# T1 and T2 are very large binary trees (not BSTs). T1 >> T2.
+# Find if T2 is a subtree of T1.
 # 
-# This method has O(____) runtime where N=____.
+# This method has O(NxM) worst-case runtime where N=num nodes in T1 and M=num nodes in T2.
+# Average case runtime is probably closer to O(N+kM), where k is the number of nodes in T1 that are the same as T2.
 
-def four_ten():
-    pass
+def four_ten(T1, T2):
+    
+    # Because T1 is very large, I assume it would be best to perform a pre-ordered
+    # DFS to look for the head of T2 (n), then check all subnodes of n.
+    # A BFS would require storing a large number of nodes in a queue while searching.
+    # However, the DFS will require a large number of recursive threads. If the depth
+    # of the tree is greater than the allowed recursion depth (~999 by default in Python),
+    # the algorithm will fail.
+    
+    
+    def DFS(node, T2_root):
+        
+        # Check current node against T2_root; if equal, check children in order.
+        
+        if node == None:
+            return False
+        
+        if node == T2_root and subnode_DFS(node, T2_root):
+            return True
+        
+        return DFS(node.left, T2_root) or DFS(node.right, T2_root)
+    
+    
+    def subnode_DFS(node_1, node_2):
+        
+        # Check subtrees of node_1 and node_2 to see if they are identical.
+        if node_1 == node_2:
+            if node_1 is None and node_2 is None:
+                return True
+            else:
+                return subnode_DFS(node_1.left, node_2.left) and subnode_DFS(node_1.right, node_2.right)
+        
+        return False
+    
+    
+    if T2 is None:  # Null node is a subtree.
+        return True
+    
+    return DFS(T1, T2)
 
 
 # 4.11
-# Description
+# Implement a BST class with method getRandomNode that returns a random node in the tree.
+# Each node should have an identical chance of being chosen.
 # 
 # This method has O(____) runtime where N=____.
 
-def four_eleven():
-    pass
+from random import uniform
+
+class four_eleven():
+    """
+    Class for a binary search tree, using the Node class above.
+    It assumes node.left <= node < node.right.
+    """
+    
+    def __init__(self):
+        self.head = None
+        self.num_nodes = 0
+    
+    def insert(self, data):
+        # Returns success/failure as boolean.
+        
+        if self.head is None:
+            
+            self.head = Node(data)
+            return True
+        
+        else:
+            
+            def insert_iterate(node):
+                
+                if node is None:
+                    return False
+                    
+                elif data <= node.value:
+                    if node.left is None:
+                        node.left = Node(data)
+                        return True
+                    else:
+                        return insert_iterate(node.left)
+                        
+                elif node.value < data
+                    if node.right is None:
+                        node.right = Node(data)
+                        return True
+                    else:
+                        return insert_iterate(node.right)
+                        
+            return_val = insert_iterate(self.head)
+            if return_val:
+                self.num_nodes += 1
+            return return_val
+    
+    def find(self, data):
+        # Uses DFS.
+        # If there are duplicate nodes, returns the first one found (highest in tree).
+        
+        def DFS(node):  # In-order depth-first search.
+            if node and node.value == data:
+                return node
+            elif data <= node.value:
+                return DFS(node.left)
+            elif node.value < data:
+                return DFS(node.right)
+            return None
+        
+        n = self.head
+        return DFS(n)
+    
+    def delete(self, data):
+        # Uses DFS.
+        
+        node = self.find(data)
+        if node:
+            if node.left or node.right:  # Children nodes.
+                # TODO: reinsert the values below this node.
+                pass # return False
+            else:  # No children nodes.
+                del node
+                self.num_nodes -= 1
+                return True
+        else:
+            return False
+    
+    def getRandomNode(self):
+        # Go through all nodes in tree until one matches a
+        # predetermined random number or we run out of nodes.
+        # This has O(N) runtime at worst, for N=num_nodes.
+        
+        def iterate(node, rand_num, node_count):
+            node_count += 1
+            if node is None:
+                return None
+            elif rand_num = node_count or node_count == self.num_nodes:
+                return node
+            else:
+                n = iterate(node.left, rand_num, node_count)
+                if n:
+                    return n
+                else:
+                    return iterate(node.right, rand_num, node_count)
+            
+        return iterate(self.head, int(uniform(1, self.num_nodes)), 0)
 
 
 # 4.12
-# Description
+# Given a binary tree (not BST), count the number of downward paths that equal a sum.
+# The path can start at any node, and end at any node.
 # 
-# This method has O(____) runtime where N=____.
+# This method has O(N * log N) runtime where N=num nodes in tree, and O(1) space.
+# An improvement can be made to change this to O(N) time and O(log N) space, but I'm tired.
 
-def four_twelve():
-    pass
+def four_twelve(tree, sum):
+    
+    # This calls trigger_iterate for each node in the tree.
+    # trigger_iterate calls sum_iterate, which sums all paths from a
+    # specific node in the tree. Both methods return path_count, which
+    # is the running sum of paths that meet the sum criteria.
+    
+    def sum_iterate(tree_node, running_sum, path_count):  # Runs once for each node, for each node above it.
+        
+        if tree_node is None or running_sum > sum:
+            return path_count
+        elif running_sum == sum:
+            return path_count + 1
+        
+        if tree_node.left:
+            path_count += sum_iterate(tree_node.left, running_sum+tree_node.value, path_count)
+        if tree_node.right:
+            path_count += sum_iterate(tree_node.right, running_sum+tree_node.value, path_count)
+        
+        return path_count
+    
+    def trigger_iterate(node, path_count):  # Runs N times.
+        
+        if node is None:
+            return path_count
+        
+        path_count += sum_iterate(node.left, node.value, path_count)
+        trigger_iterate(node.left, path_count)
+        
+        path_count += sum_iterate(node.right, node.value, path_count)
+        trigger_iterate(node.right, path_count)
+        
+        return path_count
+    
+    return trigger_iterate(tree, 0)
