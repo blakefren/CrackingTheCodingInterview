@@ -10,16 +10,14 @@ Chapter Six - Math and Logic Puzzles
 def six_one():
     
     """
-    Take N pills from bottle N for bottles 1-10 (1 from 1, 2 from 2, etc.).
-    Take 10-N pills from bottle N for bottles 11-20 (1 from 11, 2 from 12, etc.).
-    Weigh pills from bottles 1-10 on one side, and 11-20 on the other.
-    The decimal place on the heavier side should have the bottle number (or #+10).
+    Take N pills from bottle N for bottles (1 from 1, 2 from 2, etc.).
+    We can use the decimal place to find the bottle number.
     
     e.g., if bottle 13 is the heavy bottle, then the right side of the scale should show
-    XXX.3 grams. The .3 tells us that the 3rd bottle on that side, which we took 3 pills from,
-    has the heavy pills.
-    
-    Worst-case scale uses: 1
+    XXX.3 grams. The .3 tells us that it's either the 3rd or 13th bottle. We can figure out
+    which one it is by adding the expected weight if all pills are 1.0g (210g). If our current
+    weight is 0.3g above that (210.3g), it is bottle #3; otherwise if the weight is 1.3g above
+    expected (211.3g), then it is bottle #13.
     """
     
     pass
