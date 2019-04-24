@@ -370,9 +370,15 @@ class sixteen_nine:
     
     @staticmethod
     def multiply(a, b):  # TODO: negative numbers
+    
         total = 0
-        for i in range(b):
-            total += a
+        if b > 0:
+            for i in range(b):
+                total += a
+        else:
+            for i in range(a):
+                total += b
+            
         return total
     
     # Integer division, no remainder.
@@ -386,23 +392,55 @@ class sixteen_nine:
 
 
 # 16.10
-# Description
+# Given a list of people with birth and death years, find the year with the most
+# people alive. Assume all live between 1900 and 2000.
 # 
-# This method has O(____) runtime where N=____.
+# This method has O(N+M) runtime where N=len(people) and M=num years.
 
-def sixteen_ten():
+def sixteen_ten(people, start_year, end_year):
     
-    pass
+    # Assume that people is a list of tuples of length two, where the first element in the
+    #tuple is the year of birth and the second element is the year of death.
+    
+    year_changes = {year:0 for year in range(start_year, end_year+2)}  # O(M) initialization.
+    
+    for person in people:  # O(N) loop.
+        year_changes[people[0]] += 1
+        year_changes[people[1]+1] -= 1  # Need the plus one because the person isn't gone until the next year.
+    
+    sum = 0
+    max_people = 0
+    max_year = 0
+    for year in year_changes.keys:  # O(M) loop.
+        sum += year_changes[year]
+        if sum > max_people:
+            max_year = year
+            max_people = sum
+    
+    return max_year
 
 
 # 16.11
-# Description
+# You are building a diving board by placing a bunch of planks end to end. There are two lengths of
+# plank. You have to use K planks of wood. Find all possible lengths of diving board.
 # 
-# This method has O(____) runtime where N=____.
+# This method has O(K) runtime where K=K.
 
-def sixteen_eleven():
+def sixteen_eleven(K, long_len, short_len):
     
-    pass
+    queue = deque()  # Using deque for O(1) append performance.
+    
+    if K == 0:
+        pass
+    
+    elif long_len == short_len:
+        queue.append(K*long_len)
+    
+    else:    
+        for i in range(K+1):
+            queue.append((K - i)*long_len + i*short_len)
+    
+    return queue
 
 
 # 16.12
@@ -416,13 +454,64 @@ def sixteen_twelve():
 
 
 # 16.13
-# Description
-# 
-# This method has O(____) runtime where N=____.
+# Given two squares on a two-dimensional plane, find a line that would cut these two squares 
+# in half. Assume that the top and bottom sides of the square run parallel to the X-axis.
 
-def sixteen_thirteen():
+class Square:
+
+    def __init__(self, ll_x, ll_y, ul_x, ul_y, ur_x, ur_y, lr_x, lr_y):
+        
+        # Assume we have some checks here to make sure the points make a square.
+        if (not_a_square):
+            raise ValueError
+        
+        # All the X/Y coords for the points of the square.    
+        self.ll_x = ll_x
+        self.ll_y = ll_y
+        self.ul_x = ul_x
+        self.ul_y = ul_y
+        self.ur_x = ur_x
+        self.ur_y = ur_y
+        self.lr_x = lr_x
+        self.lr_y = lr_y
+        
+        # Get side length.
+        self.side_len = math.sqrt((ll_x - ul_x)**2 + (ll_y - ul_y)**2)
+        
+        # Get area,
+        self.area = self.line_len ** 2
+
+def sixteen_thirteen(square_1, square_2):
     
-    pass
+    # square_1 and square_2 are instances of the Square class above.
+    
+    # Assume that the squares can be anywhere on the two-dimensional plane.
+    # Problem states that they have sides parallel to the X-axis (they are not rotated).
+    
+    # A line dividing the square in half has to go through the midpoint. So, we can find
+    # the equation of a line that goes through both midpoints.
+    
+    sq_1_mid_x = (square_1.ll_x + square_1.lr_x) / 2
+    sq_1_mid_y = (square_1.ll_y + square_1.lr_y) / 2
+    sq_2_mid_x = (square_2.ll_x + square_2.lr_x) / 2
+    sq_2_mid_y = (square_2.ll_y + square_2.lr_y) / 2
+    
+    mid_x_equal = (sq_1_mid_x == sq_2_mid_x)
+    mid_y_equal = (sq_1_mid_y == sq_2_mid_y)
+    
+    if (mid_x_equal and mid_y_equal):  # Squares have same midpoints.
+        return ''
+    
+    elif mid_x_equal and not mid_y_equal:  # Squares' midpoints are vertically aligned.
+        return 'X = ' + str(mid_x_equal)
+    
+    else:  # Nothing special.
+        # Equation for a line from two points is:
+        # (y-y_0) = m(x-x_0)
+        # y - y_1 = (y_2 - y_1)/(x_2 - x_1) * (x - x_1)
+        
+        m = (sq_2_mid_y - sq_1_mid_y) / (sq_2_mid_x - sq_1_mid_x)
+        return 'Y - ' + str(sq_1_mid_y) + ' = ' + str(m) + ' * (X - ' + str(sq_1_mid_x) + ')'
 
 
 # 16.14
