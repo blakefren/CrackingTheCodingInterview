@@ -85,7 +85,7 @@ def sixteen_three(start_1, end_1, start_2, end_2):
     if m[0] == m[1]:  # Both lines are parallel or vertical.
         
         if b[0] == b[1] and b[0] is not None:  # Lines are the same (non-vertical).
-            if is_between(start_2[0], start_1[0], end_2[0]) and is_between(start_2[1], start_1[1], end_2[1])
+            if is_between(start_2[0], start_1[0], end_2[0]) and is_between(start_2[1], start_1[1], end_2[1]):
                 return start_1
             elif is_between(start_2[0], end_1[0], end_2[0]) and is_between(start_2[1], end_1[1], end_2[1]):
                 return end_1
@@ -140,7 +140,7 @@ def sixteen_four(board):
     
     # We could make a class that stores the values for all NxN boards in a dict and
     # reference them at runtime to get O(1) performance (after initialization). Having the board
-    # input has a tuple of tuples will let us store the board as-is as a dict key.
+    # input as a tuple of tuples will let us store the board as-is as a dict key.
     
     # board is a tuple of tuples of the board, where 1 is an X and
     # 0 is an O. Any other char may be used to show an empty space.
@@ -191,9 +191,9 @@ def sixteen_four(board):
     
     if sum([col[0] for col in col_sum]) == N or forward_diag[0] == N or backward_diag[0] == N:
         return 'X'
-    elif sum([col[1] for col in col_sum]) == N or forward_diag[1] == N ro backward_diag[1] == N:
+    elif sum([col[1] for col in col_sum]) == N or forward_diag[1] == N or backward_diag[1] == N:
         return 'O'
-    else
+    else:
         return None
 
 
@@ -203,6 +203,7 @@ def sixteen_four(board):
 # Other than efficiency, this solution can create numbers larger than an int type can store.
 # 
 # The class init and zeros method has O(N) runtime where N=N.
+
 class sixteen_five:
     
     def __init__(self, N=100):
@@ -284,8 +285,6 @@ def sixteen_six(array_1, array_2):
 
 # 16.7
 # Find the max of two numbers without using if/else statements or comparison operators.
-# 
-# This method has O(1) runtime.
 
 def sixteen_seven(a, b):
     return (a+b)/2 + abs(a-b)/2
@@ -355,7 +354,7 @@ def sixteen_eight(num):
 # Write methods to implement multiply, subtract, and divide for integers.
 # You can use the add operator, but not multiply, subtract, or divide.
 # 
-# This method has O(____) runtime where N=____.
+# This method has O(____) runtime where N=____. (INCOMPLETE)
 
 class sixteen_nine:
     
@@ -525,61 +524,255 @@ def sixteen_fourteen():
 
 
 # 16.15
-# Description
+# Return the number of hits and pseudo-hits for a guess in a game of Master Mind.
+# Master Mind: there are four slots, each with one color of Red/Green/Blue/Yellow.
+# The player guesses four colors, and for each guess, it can either be a hit (correct
+# color and space), a pseudo-hit (correct color, incorrect space), or a miss (color is
+# not in the answer).
 # 
-# This method has O(____) runtime where N=____.
+# This method has O(N) runtime where N=number of slots in the guess/solution.
 
-def sixteen_fifteen():
+def sixteen_fifteen(guess, solution):
     
-    pass
+    # Assume that each input is a four-character string of the colors. 
+    # R=Red, G=Green, B=Blue, and Y=Yellow.
+    # This solution will work for N-length guesses and solutions.
+    
+    if len(guess) != len(solution):
+        return []
+    
+    guess = guess.upper()
+    solution = solution.upper()
+    
+    color_counts = {
+        'R':0,
+        'G':0,
+        'B':0,
+        'Y':0,
+    }
+    
+    # Get a hash table of the number of each color excluding hits.
+    for i, color in enumerate(solution):
+        if solution[i] != guess[i]:
+            color_counts[color] += 1
+    
+    hits = 0
+    pseudo_hits = 0
+    
+    # Check the guess.
+    for i, color in enumerate(guess):
+        if guess[i] == solution[i]:  # Hit.
+            hits += 1
+        elif color_counts[color] > 0:  # Pseudo-hit.
+            pseudo_hits += 1
+            color_counts[color] -= 1
+    
+    return [hits, pseudo_hits]
 
 
 # 16.16
-# Description
+# Given an array of integers, find the indeces m and n so that, if m through n were sorted,
+# the entire array would be sorted. Find the smallest sub array (minimize n-m).
 # 
-# This method has O(____) runtime where N=____.
+# This method has O(N) runtime where N=len(array).
 
-def sixteen_sixteen():
+def sixteen_sixteen(array):
     
-    pass
+    # Find the largest number on the left at the end of a continuously increasing run, and
+    # the smallest number on the right at the beginning of a continuously decreasing run.
+    
+    if len(array) == 0:
+        return [0, 0]
+    
+    # Initiate vars for m.
+    m = 0
+    run = [array[0]]
+    remaining_min = sys.maxsize
+    run_flag = True
+    
+    # Loop through array once for m.
+    for i in range(1, len(array)):
+        
+        if run_flag:  # Identify the continually increasing run at the start.
+            
+            if array[i] >= array[i-1]:
+                run.append(array[i])  # O(1) append.
+            
+            elif array[i] < array[i-1]:
+                run_flag = False
+                remaining_min = min(array[i], remaining_min)
+        
+        else:  # Find the lowest value in the remaining array elements.
+            remaining_min = min(array[i], remaining_min)
+    
+    if remaining_min == sys.maxsize:  # Array is already sorted.
+        return [0, 0]
+    
+    # Find the position of the largest element in run that is less than remaining_min.
+    for j in reversed(range(len(run))):  # Going backwards in case of duplicate elements.
+        if run[j] <= remaining_min:
+            m = j + 1
+            break
+    
+    # Initiate vars for n.
+    n = len(array)-1
+    run = []
+    remaining_max = -1*sys.maxsize
+    run_flag = True
+    
+    # Loop through array once for n.
+    for k in reversed(range(1, len(array))):
+        
+        if run_flag:  # Find the continually decreasing run at the end.
+            
+            if array[k] >= array[k-1]:
+                run.append(array[k])  # run will be in decreasing order.
+            
+            elif array[k] < array[k-1]:
+                run_flag = False
+                remaining_max = max(array[k], remaining_max)
+        
+        else:  # Find the largest value in the remaining array elements.
+            remaining_max = max(array[k], remaining_max)
+    
+    # Find the position of the smallest element in run that greater than remaining_ma
+    for l in reversed(range(len(run))):  # Backwards in case of duplicate elements.
+        if run[l] >= remaining_max:
+            n = (len(array) - 1) - (l + 1)
+            break
+    
+    return [m, n]
 
 
 # 16.17
-# Description
+# Given an array of integers (positive and negative), find the continuous sequence
+# with the largest sum.
 # 
-# This method has O(____) runtime where N=____.
+# This method has O(N) runtime where N=len(array).
 
-def sixteen_seventeen():
+def sixteen_seventeen(array):
     
-    pass
+    # We can look at a running sum through the array. 
+    # If the array becomes larger than max_sum, set max_sum to it.
+    # If the sum becomes negative, reset the running sum to 0.
+    
+    max_sum = -1*sys.maxsize
+    current_sum = 0
+    
+    for item in array:
+        
+        current_sum += item
+        max_sum = max(current_sum, max_sum)
+        if current_sum < 0:
+            current_sum = 0
+            
+    return max_sum
 
 
 # 16.18
-# Description
+# Given a pattern and a value string, determine if value matches the pattern for two substrings.
+# Pattern holds chars a and b and denote the pattern followed by the two substrings.
 # 
-# This method has O(____) runtime where N=____.
+# This method has O(N^2) runtime where N=len(value).
 
-def sixteen_eighteen():
+def sixteen_eighteen(pattern, value):
     
-    pass
+    if len(pattern) == 0 or len(value) == 0:
+        return False
+    
+    # main is either a or b, alt is the other.
+    main_char = pattern[0]
+    main_count = pattern.count(main_char)  # O(N).
+    alt_char = 'a' if main_char == 'b' else 'b'
+    alt_count = pattern.count(alt_char)  # O(N).
+    
+    for main_len in range(1, len(value) // main_count + 1):  # Iterate for the main substring. O(N) loop.
+        
+        main_sub = value[0:main_len]  # O(N).
+        alt_sub = None
+        alt_len = -1
+        
+        # Get alt_len.
+        if alt_count == 0:
+            alt_len = 0
+        else:
+            alt_len = (len(value) - main_len * main_count) // alt_count
+        
+        # Get alt_sub.
+        if (alt_len * alt_count) + (main_len * main_count) != len(value):
+            continue  # Number of projected characters is incorrect; main_len is wrong.
+        else:
+            if alt_count > 0:
+                first_alt_pos = pattern.index(alt_char) * main_len
+                alt_sub = value[first_alt_pos:alt_len+first_alt_pos]  # O(N).
+            else:
+                alt_sub = ''
+        
+        # Build the test string.
+        test_string = []
+        for pattern_char in pattern:  # O(N).
+            test_string.append(main_sub if pattern_char == main_char else alt_sub)
+        
+        # Compare the test string.
+        if ''.join(test_string) == value:  # O(N) comparison.
+            return True
+        
+    return False
 
 
 # 16.19
-# Description
+# Given an integer matrix representing a land area where 0's are water, find
+# the sizes of all ponds. A pond is one or more adjacent 0's, where adjacent is defined
+# as being vertically, horizontally, or diagonally next to another 0.
 # 
-# This method has O(____) runtime where N=____.
+# This method has O(RC) runtime where R=num_rows and C=num_cols. At worst, each cell is hit 9 times.
 
-def sixteen_nineteen():
+def sixteen_nineteen(land):
     
-    pass
+    # pond is a list of lists, assumed to be rectangular.
+    
+    # We can iterate through all chars to look for zeros (water).
+    # If we find one, we can recursively check all neighbors for zeros, and their neighbors, etc.
+    # Once we have visited a water cell, change its value so we don't visit it again.
+    
+    def find_size(row, col):
+        
+        if 0 > row or row >= len(land) or 0 > col or col >= len(land[0]) or land[row][col] != 0:
+            return 0
+        
+        land[row][col] = -1
+        size = 1
+        for r in range(-1, 2):
+            for c in range(-1, 2):
+                size += find_size(row+r, col+c)
+        
+        return size
+    
+    
+    sizes = []    
+    if len(land) == 0 or len(land[0]) == 0:
+        return sizes
+    
+    for i, cols in enumerate(land):  # O(R) loop.
+        for j in range(len(cols)):  # O(C) loop.
+            if land[i][j] == 0:
+                sizes.append(find_size(i, j))
+    
+    return sizes
 
 
 # 16.20
-# Description
+# Given a dictionary of English words, find all words that match a number taken
+# from a numeric keypad representation (cell phone keys). Ex.: 8733 -> [tree, used]
 # 
 # This method has O(____) runtime where N=____.
 
-def sixteen_twenty():
+def sixteen_twenty(dictionary, numeric_word):
+    
+    # Store the entire English dictionary in a hash table where the key
+    # is the phone number representation, and the value is the word.
+    # Precalculation work is O(N) for the number of words in the English language.
+    # Lookups then become O(D) for the number of digits in the word.
     
     pass
 
@@ -615,13 +808,29 @@ def sixteen_twentythree():
 
 
 # 16.24
-# Description
+# Given an array of ints and a integer value, find all array element pairs that
+# sum to the given value.
 # 
-# This method has O(____) runtime where N=____.
+# This method has O(N) runtime where N=num values in array.
 
-def sixteen_twentyfour():
+def sixteen_twentyfour(array, value):
     
-    pass
+    sum_matches = []
+    array_vals = {}
+    
+    for num in array:  # Count occurences of numbers in array. O(N) loop.
+        if num not in array_vals:
+            array_vals[num] = 0
+        array_vals[num] += 1
+    
+    for num in array:  # O(N) loop.
+        needed_val = value - num
+        if (num != needed_val and array_vals.get(needed_val, 0) >= 1) or (num == needed_val and array_vals.get(needed_val, 0) >= 2):  # O(1) lookup.
+            sum_matches.append((num, needed_val))
+            array_vals[num] -= 1
+            array_vals[needed_val] -= 1
+    
+    return sum_matches
 
 
 # 16.25
