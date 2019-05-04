@@ -834,22 +834,101 @@ def sixteen_twentyfour(array, value):
 
 
 # 16.25
-# Description
+# Create a "least recently used" cache. It has a max size and will remove the least
+# recently used item when inserting new elements while at the max size. The cache should map
+# keys to values and return the value associated with the key when queried.
 # 
-# This method has O(____) runtime where N=____.
+# This class has O(N) runtime for insertion at max size where N=max_size, and 
+# O(1) for all other operations. This can be O(1) with the book method.
 
-def sixteen_twentyfive():
+import datetime
+
+class sixteen_twentyfive:
     
-    pass
+    def __init__(self, max_size):
+        self._max_size = max_size
+        self._current_size = 0
+        self._dict = {}
+        self._last_use = {}
+    
+    def insert_value(key, value):
+        
+        # Remove an item if needed, otherwise increment size by one.
+        if self._current_size == self._max_size:  # Remove least recently used item.
+            key_to_remove = min(self._last_use, key=self._last_use.get)
+            del self._dict[key_to_remove]
+            del self._last_use[key_to_remove]
+        else:  # Add new value or overwrite existing value.
+            self._current_size += 1
+        
+        # Add the new item.
+        self._dict[key] = value
+        self._last_use[key] = datetime.datetime.now()
+    
+    def remove_value(key):
+        try:
+            if key in self._dict:
+                del self._dict[key]
+                del self._last_use[key]
+                self._current_size -= 1
+                return True
+        except:
+            return False
+    
+    def get_value(key):
+        self._last_use[key] = datetime.datetime.now()
+        return self._dict.get(key, None)
 
 
 # 16.26
-# Description
+# Create a calculator for a string of basic arithemetic, including addition,
+# subtraction, multiplication, and division.
+# Ex.: equation = 2*3+5/6*3+15
+# I am assuming there are no parenthesis and all numbers are integers.
 # 
-# This method has O(____) runtime where N=____.
+# This method has O(____) runtime where C=number of chars in equation.
 
-def sixteen_twentysix():
+# INCOMPLETE
+
+def sixteen_twentysix(equation):
     
-    pass
-
-
+    # Parse through the equation and identify all numbers and operators.
+    object_type = {}  # Dict where key=string_index and value=[type, object_counter]
+    objects_by_num = {}  # Dict where key=object_counter and value=object.
+    type_nums = {
+        # Ints are type 0.
+        '+':1,
+        '-':2,
+        '*':3,
+        '/':4
+    }
+    object_counter = 0
+    current_num = False
+    
+    def is_int(num):
+        try:
+            int(num)
+            return True
+        except:
+            return False
+    
+    # Fill dicts with info.
+    for i, char in enumerate(equation):  # O(C) loop.
+        
+        if is_int(char):
+            if not current_num:  # New number after operator (or start).
+                object_counter += 1
+            object_type[i] = [0, object_counter]
+            objects_by_num[object_counter] = objects_by_num.get(object_counter, 0)*10 + int(char)
+            current_num = True
+        
+        else:  # Operators.
+            object_counter += 1
+            object_type[i] = [type_nums[char], object_counter]
+            objects_by_num[object_counter] = char
+            current_num = False
+    
+    # Iterate through the equation and run multiply and divide operations.
+    for id in objects_by_num.keys():
+        if objects_by_num[id] == '*':
+            
