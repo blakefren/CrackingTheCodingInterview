@@ -17,7 +17,7 @@ def sixteen_one(a, b):
     a = a^b  # Using XOR, get bits that are different between the two numbers.
     b = a^b  # a is XOR output, so check that against b - values that differ will be swapped, which gives a.
     a = a^b  # Do the same for a.
-    return (a,b)
+    return a, b
 
 
 # 16.2
@@ -43,7 +43,7 @@ class sixteen_two:
             else:
                 self._word_counts[w] = 1
 
-    def get_word_freq(word):
+    def get_word_freq(self, word):
         return self._word_counts.get(word.lower(), 0)  # Returns 0 if word not in book.
 
 
@@ -881,7 +881,7 @@ class sixteen_twentyfive:
 
 
 # 16.26
-# Create a calculator for a string of basic arithemetic, including addition,
+# Create a calculator for a string of basic arithmetic, including addition,
 # subtraction, multiplication, and division.
 # Ex.: equation = 2*3+5/6*3+15
 # I am assuming there are no parenthesis and all numbers are integers.
