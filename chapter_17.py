@@ -2,6 +2,9 @@
 Chapter Seventeen - Hard
 """
 
+from random import randint
+from collections import deque
+
 
 # 17.1
 # Add two numbers without using any arithmetic operators.
@@ -34,8 +37,6 @@ def seventeen_one(a, b):
 # 
 # This method has O(C) runtime where C is the number of cards in the deck.
 
-from random import randint
-
 def seventeen_two(cards):
 
     # Swap card at i with a random card in the deck.
@@ -50,22 +51,36 @@ def seventeen_two(cards):
 
 
 # 17.3
-# Description
+# Generate a set of m integers from an array of size n, where each of the n! permutations
+# has an equal chance of being chosen. Assume a perfect random number generator.
 # 
-# This method has O() runtime, where _ = ____.
+# This method has O(n) runtime, where n = number array size.
 
-def seventeen_three():
-    
-    pass
+def seventeen_three(m, numbers):
+
+    n = len(numbers)
+    if m > n:
+        return []
+
+    m_lst = numbers[0:m]
+
+    for i in range(m, n):  # Swap numbers after m.
+        index = randint(0, i)  # Assume this is a perfect generator.
+        if index < m:
+            m_lst[index] = numbers[i]
+
+    return m_lst
 
 
 # 17.4
-# Description
+# An array A contains all integers from 0 to n except for one number. Find the missing integer.
+# You cannot access the entire array A with a single operation. You can access the jth bit of
+# the ith number in A using an assumed method.
 # 
 # This method has O() runtime, where _ = ____.
 
 def seventeen_four():
-    
+
     pass
 
 
@@ -80,33 +95,102 @@ def seventeen_five():
 
 
 # 17.6
-# Description
+# Count the number of 2's that appear in all numbers from 0 to n.
 # 
-# This method has O() runtime, where _ = ____.
+# This method has O(n*log(n)) runtime.
 
-def seventeen_six():
-    
-    pass
+def seventeen_six(n):
+
+    # Brute force solution. There is a better solution.
+    num_twos = 0
+
+    for i in range(n+1):  # To include n as well.
+        num_twos += str(i).count('2')  # O(2j) where j=num digits in i, which scales with log(N).
+
+    return num_twos
 
 
 # 17.7
-# Description
+# Given a list of baby names and the number of babies with those names, and a list of
+# name synonyms (e.g., John and Jon), find the true number of babies with those names.
 # 
-# This method has O(____) runtime, where _ = ____.
+# This method has O(NS) runtime, where N = number of names and S = number of synonym pairs.
+# This is a worst-case runtime if all names are synonyms of one another.
 
-def seventeen_seven():
-    
-    pass
+def seventeen_seven(names_dict, synonyms):
+
+    # names is a dict of name:count.
+    # synonyms is a list of tuples of size 2, where each tuple has two names.
+
+    # Store the synonyms in a graph. Each connected subgraph will have all synonyms.
+    edges = {}
+    visited_nodes = {}
+    for name in synonyms:  # O(S).
+
+        visited_nodes[name[0]] = False
+        if name[0] not in edges:
+            edges[name[0]] = []
+        edges[name[0]].append(name[1])
+
+        visited_nodes[name[1]] = False
+        if name[1] not in edges:
+            edges[name[1]] = []
+        edges[name[1]].append(name[0])
+
+    # Perform a BFS through each subgraph to get the true name counts.
+    true_counts = {}
+    for name in names_dict:  # O(N).
+
+        if visited_nodes[name]:  # Already processed this name.
+            continue
+
+        # BFS through the graph.
+        true_counts[name] = 0
+        queue = deque()
+        queue.append(name)
+        while queue:  # This and for loop are O(S) worst case together.
+
+            # Get current node/name and increase count.
+            current_name = queue.popleft()
+            visited_nodes[current_name] = True
+            true_counts[name] += names_dict[name_node]
+
+            # Go through all adjacent nodes/names and add to queue if not visited.
+            for name_node in edges[current_name]:
+                if not visited_nodes[name_node]:
+                    queue.append(name_node)
+
+    return true_counts
 
 
 # 17.8
-# Description
+# A human circus tower can only be created by people standing on one another, where people
+# must be lighter and shorter people than the person below them. Given a list of people
+# with heights and weights, find the largest tower they can make.
 # 
-# This method has O(____) runtime, where _ = ____.
+# This method has O(P*logP) runtime, where P = number of people.
 
-def seventeen_eight():
-    
-    pass
+def seventeen_eight(people):
+
+    # People is a list of tuples of length 2, where item[0] is their height, and item[1] is their weight.
+
+    if len(people) == 0:
+        return 0
+
+    people = sorted(people, key=lambda x: x[0])  # Sort people by heights. O(P*logP).
+    start = 0
+    end = 0
+    longest_sequence = 0
+
+    for i in range(1, len(people)):  # O(P).
+        if people[i][1] > people[i-1][1]:  # Weight check.
+            end = i
+        else:
+            longest_sequence = end - start + 1
+            start = i
+            end = i
+
+    return max(longest_sequence, end - start + 1)
 
 
 # 17.9
