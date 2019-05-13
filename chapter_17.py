@@ -4,6 +4,7 @@ Chapter Seventeen - Hard
 
 from random import randint
 from collections import deque
+import sys
 
 
 # 17.1
@@ -194,13 +195,49 @@ def seventeen_eight(people):
 
 
 # 17.9
-# Description
+# Find the k-th number so that the only prime factors are 3, 5, or 7.
 # 
-# This method has O(____) runtime, where _ = ____.
+# This method has O(k) runtime.
 
-def seventeen_nine():
+def seventeen_nine(k):
     
-    pass
+    # Each of these numbers can be represented by:
+    # number = 3^x * 5^y * 7^z
+
+    if k == 1:
+        return 1
+
+    k_count = 1
+    q_3 = deque()
+    q_3.append(3)
+    q_5 = deque()
+    q_5.append(5)
+    q_7 = deque()
+    q_7.append(7)
+    next_num = None
+
+    while k_count < k:  # O(k).
+
+        next_num = min(q_3[0], q_5[0], q_7[0])
+
+        if next_num == q_3[0]:
+            q_3.popleft()
+            q_3.append(next_num * 3)
+            q_5.append(next_num * 5)
+            q_7.append(next_num * 7)
+
+        elif next_num == q_5[0]:
+            q_5.popleft()
+            q_5.append(next_num * 5)
+            q_7.append(next_num * 7)
+
+        elif next_num == q_7[0]:
+            q_7.append(next_num * 7)
+            q_7.popleft()
+
+        k_count += 1
+
+    return next_num
 
 
 # 17.10
