@@ -196,11 +196,12 @@ def seventeen_eight(people):
 
 # 17.9
 # Find the k-th number so that the only prime factors are 3, 5, or 7.
+# Book solution. Mine sucked.
 # 
 # This method has O(k) runtime.
 
 def seventeen_nine(k):
-    
+
     # Each of these numbers can be represented by:
     # number = 3^x * 5^y * 7^z
 
