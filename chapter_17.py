@@ -204,6 +204,9 @@ def seventeen_nine(k):
 
     # Each of these numbers can be represented by:
     # number = 3^x * 5^y * 7^z
+    # We will create three queues, one for 3, 5, and 7, and take the smallest
+    # number from the left side of the three. We will add multiples of that number
+    # and 3, 5, or 7 to the end of the queues. We repeat this k times to get the kth number.
 
     if k == 1:
         return 1
