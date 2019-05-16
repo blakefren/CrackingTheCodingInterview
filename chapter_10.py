@@ -10,8 +10,8 @@ Chapter Ten - Sorting and Searching
 # This method has O(a) runtime where a=len(A).
 
 def ten_one(A, B):
-    # We will iterate through both arrays in reverse order.
 
+    # We will iterate through both arrays in reverse order.
     # Assume that A and B are filled with objects that support simple comparisons.
     # Also assume that the empty elements of A are None.
 
@@ -57,7 +57,7 @@ def ten_one(A, B):
 # 10.2
 # Sort an array of strings so that the anagrams are next to each other.
 # 
-# This method has O(S) runtime where S=len(strings).
+# This method has O(S*L) runtime where S=number of strings and L=average string length.
 
 def get_string_score(string):
     print(string)
@@ -76,8 +76,8 @@ def ten_two(strings):
     max_score = 0
 
     # Get the ASCII-based score for each string.
-    for i in range(len(strings)):
-        score = get_string_score(strings[i])
+    for i in range(len(strings)):  # O(S).
+        score = get_string_score(strings[i])  # O(L).
         sorted_str.append(i)
         str_locations[i] = score
         max_score = max(score, max_score)
@@ -113,13 +113,58 @@ def ten_two(strings):
 
 
 # 10.3
-# Description
+# Given an array that has been sorted in increasing order, then rotated an unknown number of
+# times, find a specific element in the array and return its index.
 # 
-# This method has O() runtime where N=____.
+# This method has O(logN) normal and O(N) worst-case runtime where
+# N=number of array elements.
 
-def ten_three():
+def modified_binary_search(array, element, start, end):
+
+    middle = (end - start) // 2
+
+    # There are a few cases that determine where we will search.
+
+    # Search to the right - normal order.
+    if array[middle] < array[end]:
+        if array[middle] <= element <= array[end]:  # Right half.
+            return modified_binary_search(array, element, middle + 1, end)
+        else:  # Left half.
+            return modified_binary_search(array, element, start, middle - 1)
+
+    # Search to the left - normal order.
+    elif array[start] < array[middle]:
+        if array[start] <= element <= array[middle]:  # Left half.
+            return modified_binary_search(array, element, start, middle - 1)
+        else:  # Right half.
+            return modified_binary_search(array, element, middle + 1, end)
+
+    else:  # We have a lot of duplicates.
+
+        # It should be in the right half.
+        if array[start] == array[middle]:
+            return modified_binary_search(array, element, middle + 1, end)
+
+        # It should be in the left half.
+        if array[middle] == array[end]:
+            return modified_binary_search(array, element, start, middle - 1)
+
+        # Could be anywhere, so search through all elements.
+        else:
+            for i in range(len(array)):
+                if array[i] == element:
+                    return i
+            return -1
+
+
+def ten_three(array, element):
     
-    pass
+    # We can do this with a modified binary search.
+
+    if len(array) == 0:
+        return None
+
+    return modified_binary_search(array, element, 0, len(array) - 1)
 
 
 # 10.4
@@ -154,7 +199,7 @@ def ten_six():
 
 # 10.7
 # Description
-# 
+#
 # This method has O() runtime where N=____.
 
 def ten_seven():
@@ -168,18 +213,57 @@ def ten_seven():
 # This method has O() runtime where N=____.
 
 def ten_eight():
-    
+
     pass
 
 
 # 10.9
-# Description
+# Given an MxN matrix where each row and column is sorted in ascending order, find an element.
 # 
-# This method has O() runtime where N=____.
+# This method has O(logM+logN) runtime where M=number of matrix rows and N=number of matrix columns.
+# INCOMPLETE
 
-def ten_nine():
-    
-    pass
+def binary_search_matrix(matrix, element, top_row, bottom_row, left_col, right_col):
+
+    if top_row > bottom_row:
+        return -1
+
+    middle_row = (bottom_row - top_row) // 2
+    middle_col = (right_col - left_col) // 2
+
+    if matrix[middle_row][middle_col] == element:  # Found it.
+        return middle_row, middle_col
+
+    elif element < matrix[middle_row][middle_col]:  # Search up and to the left.
+        return binary_search_matrix(array, element, top_row, middle_row, left_col, middle_col)
+
+    elif element > array[middle_row]:  # Search down and to the right.
+        return binary_search_matrix(array, element, middle_row, bottom_row, middle_col, right_col)
+
+    # TODO
+    elif ____:  # Search up and to the right.
+        return binary_search_matrix(array, element, top_row, middle_row, middle_col, right_col)
+
+    elif ____:  # Search down and to the left.
+        return binary_search_matrix(array, element, middle_row, bottom_row, left_col, middle_col)
+
+    else:  # It's not here.
+        return -1
+
+
+def ten_nine(matrix, element):
+
+    # I imagine some sort of binary search would be useful here.
+
+    m = len(matrix)
+    if m == 0:
+        return -1, -1
+
+    n = len(matrix[0])
+    if n == 0:
+        return -1, -1
+
+    return binary_search_matrix(matrix, element, 0, m, 0, n)
 
 
 # 10.10
