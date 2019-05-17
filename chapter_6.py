@@ -220,32 +220,72 @@ def six_seven():
 
 
 # 6.8
-# Description
-# 
-# This method has O(____) runtime where N=____.
+# Given a building with 100 floors and 2 eggs, find the lowest floor N where dropping
+# an egg will break it. Minimize the worst case number of drops.
 
 def six_eight():
+    
+    """
+    We can use the first egg to get close to the correct floor, and use the
+    second egg to find the exact floor. We start by testing every 10th floor (10,
+    20, 30, etc.). When the egg breaks on the ith floor, we know the floor is
+    between floors i and i-1. We go back to floor i-1 and increment testing
+    every floor upwards with our second egg until it breaks. That floor is N.
+    In the general case, the most efficient number to skip is sqrt(# floors),
+    which gives 2*sqrt(# floors)-1 worst case drops.
+    
+    However, the book solution is much more efficient. It begins by skipping X floors
+    with the first egg, then (X-1) floors, then (X-2) floors, etc. This way, the number
+    of total egg drops from egg one and egg two are the same. In the case of 100 floors,
+    X is 14, and there are only 14 steps in the worst case.
+    """
     
     pass
 
 
 # 6.9
-# Description
-# 
-# This method has O(____) runtime where N=____.
+# Given 100 closed lockers, a man toggles (open if closed, close if opened) every ith
+# locker for i = 1 to 100. How many lockers are left open after the 100th pass?
 
 def six_nine():
+    
+    """
+    For all lockers, they should be open and shut an even number of times leaving all
+    lockers closed (except for a few). Since each locker will be toggled once for each
+    of its factors up to the square root, and again for each factor after the square
+    root, the number of toggles will always be even and all lockers will be shut.
+
+    Except when we have a square number. Since a square number has an “extra” root, that
+    root will only be toggled once and will not have a corresponding number to “undo” its
+    toggle. This will leave all the square numbers open, and no others. So, that becomes
+    the number of square numbers less than or equal to 100, which is 10 lockers.
+    """
     
     pass
 
 
 # 6.10
-# Description
-# 
-# This method has O(____) runtime where N=____.
+# Given 1000 bottles of soda, where one is poisoned, find the poisoned bottle. You are given
+# 10 test strips that change color if the poison contacts it, but the test takes seven days
+# and you can only run tests once per day. You can run as many tests as you like each day, and
+# you can place as much liquid as you want on the test strips, as they will only change color
+# in the presence of the poison.
 
 def six_ten():
     
+    """
+    This (book) solution is the best solution possible. My solution was the 28 day solution,
+    which is the next best solution if you assume that you only have 10 strips. The book's
+    non-optimal solutions assume that you get 10 per day, even though the prompt does not say that.
+
+    We take each (numbered) bottle and change its number to a binary representation. Since
+    we have 10 strips, we can store up to 2^10 = 1024 bottles. We label each test strip as
+    a binary location 1-10. Then, we place drops for the binary representation for each bottle
+    on the numbered strips. For example, 1000 in binary is 1111101000. So, we would place drops
+    from bottle #1000 on strips 4, 6, 7, 8, 9, and 10. We then send all 10 strips for testing.
+    When we receive the results, we can rebuild our binary number with the numbered strips, and
+    find our bottle number. This search always takes 7 days in any case for any number of bottles,
+    assuming that we always have enough strips so that 2^(# strips) >= (# bottles).
+    """
+    
     pass
-
-

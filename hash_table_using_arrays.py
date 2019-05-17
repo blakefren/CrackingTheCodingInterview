@@ -83,7 +83,7 @@ class hash_table:
             self._max_size += 2
         
         temp_array = deepcopy(self._array)
-        self._array += [None] * (self._max_size - old_len)  # Pretend I'm using real arrays.
+        self._array += [None] * (self._max_size - len(temp_array))  # Pretend I'm using real arrays.
         
         for value in temp_array:
             
