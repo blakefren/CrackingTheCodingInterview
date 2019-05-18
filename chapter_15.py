@@ -2,7 +2,10 @@
 Chapter Fifteen - Moderate
 """
 
-from threading import Lock
+from time import sleep
+from datetime import datetime
+from threading import Lock, Thread, Semaphore
+from multiprocessing import Pool
 
 # 15.1
 # Description
@@ -70,6 +73,10 @@ class fifteen_four:
         self._cyclic = False
         self._new_nodes = True
 
+    def _mark_nodes_unvisited(self):
+        for function in self.functions:  # Mark all as unvisited.
+            self.functions[function] = False
+
     def register_function(self, function_name, dependencies_lst):
         self._new_nodes = True
         self.functions[function_name] = False  # To mark as visited during graph search.
@@ -99,6 +106,7 @@ class fifteen_four:
                 if func == function_name:
                     self._cyclic = True
                     self._new_nodes = False
+                    self._mark_nodes_unvisited()
                     return False  # Graph is cyclic.
 
                 if not self.functions[func]:  # If not visited, add to the queue.
@@ -108,8 +116,7 @@ class fifteen_four:
 
         self._cyclic = False
         self._new_nodes = False
-        for function in self.functions:  # Mark all as unvisited.
-            self.functions[function] = False
+        self._mark_nodes_unvisited()
 
         self.locked = Lock.acquire(True, timeout=10)  # Give it 10 seconds to get a lock.
         return self.locked
@@ -126,30 +133,102 @@ class fifteen_four:
 
 
 # 15.5
-# Description
-# 
-# This method has O(____) runtime, where ____=____.
+# Given class Foo below and three threads, where one of each will execute first, one second, and one third,
+# design a mechanism to ensure that methods first, second, are called in order and completed before the
+# next thread is called.
+
+class Foo:
+
+    def __init__(self):
+        self.sem = Semaphore(1)  # One thread at a time.
+
+    def first(self):
+        self.sem.acquire()
+        print('\nfirst start - ' + str(datetime.now()))
+        sleep(1)
+        print('first end - ' + str(datetime.now()))
+        self.sem.release()
+
+    def second(self):
+        self.sem.acquire()
+        print('\nsecond start - ' + str(datetime.now()))
+        sleep(1)
+        print('second end - ' + str(datetime.now()))
+        self.sem.release()
+
+    def third(self):
+        self.sem.acquire()
+        print('\nthird start - ' + str(datetime.now()))
+        sleep(1)
+        print('third end - ' + str(datetime.now()))
+        self.sem.release()
 
 def fifteen_five():
     
-    pass
+    foo = Foo()
+
+    # Create three threads.
+    targets = [Thread(target=foo.first()), Thread(target=foo.second()), Thread(target=foo.third())]
+    threads = []
+
+    # Execute them in order.
+    for i in range(3):
+        t = targets[i]
+        threads.append(t)
+        t.start()
 
 
 # 15.6
-# Description
-# 
-# This method has O(____) runtime, where ____=____.
+# Given a class with a synchronized method A and a normal method B and two threads, (1) can both threads
+# execute A at the same time, and (2) can one execute A and one execute B.
 
 def fifteen_six():
-    
+
+    """
+    For my sanity: a synchronized method in a class means that it can only be run by one thread
+    at a time for a single object instance.
+
+    (1) - no, assuming we're talking about a single instance of the object
+    (2) - yes
+    """
+
     pass
 
 
 # 15.7
-# Description
-# 
-# This method has O(____) runtime, where ____=____.
+# Implement FizzBuzz with four threads. (1) checks for divisibility by 3 and prints "Fizz", (2) checks for
+# divisibility by 5 and prints "Buzz", (3) checks for divisibility by 3 and 5 and prints "FizzBuzz", and (4)
+# handles the remaining numbers.
+#
+# My method doesn't print them in order, but it prints them.
 
-def fifteen_seven():
-    
-    pass
+def t_one(n):
+    for num in range(1, n + 1):
+        if num % 3 == 0 and num % 5 == 0:
+            print(str(num) + ' - FizzBuzz')
+
+def t_two(n):
+    for num in range(1, n + 1):
+        if num % 3 == 0 and num % 5 != 0:
+            print(str(num) + ' - Fizz')
+
+def t_three(n):
+    for num in range(1, n + 1):
+        if num % 3 != 0 and num % 5 == 0:
+            print(str(num) + ' - Buzz')
+
+def t_four(n):
+    for num in range(1, n + 1):
+        if num % 3 != 0 and num % 5 != 0:
+            print(str(num))
+
+
+def fifteen_seven(n):
+
+    threads = []
+    targets = [Thread(target=t_one(n)), Thread(target=t_two(n)), Thread(target=t_three(n)), Thread(target=t_four(n))]
+
+    for i in range(4):
+        t = targets[i]
+        threads.append(t)
+        t.start()
