@@ -514,13 +514,44 @@ def sixteen_thirteen(square_1, square_2):
 
 
 # 16.14
-# Description
+# Given a two dimensional graph with points on it, find a line which passes the most 
+# number of points. (I assume that means passes THROUGH the most number of points).
 # 
-# This method has O(____) runtime where N=____.
+# This method has O(P^3) runtime where P=num points.
+# The book solution has O(P^2) using a hash table.
 
-def sixteen_fourteen():
+def sixteen_fourteen(points):
     
-    pass
+    # points is a list of tuples if (x_i, y_j)
+    
+    # Brute force: calculate lines for every pair of points, 
+    # and see if any other points fit into the line. O(P^3) solution.
+    
+    # Cover 0 and 1 point count cases.
+    if len(points) < 2:
+        return len(points)
+    
+    # Otherwise we're guaranteed at least 2 points in a line.
+    max_points = 2
+    
+    for point_1 in points:
+        for point_2 in points:
+            
+            # Line equation: (y - y_1) = (y_1 - y_2)/(x_1 - x_2) * (x - x_1)
+            # Then m = (y_1 - y_2)/(x_1 - x_2) and b = -m * x_1 + y_1
+            # so that y = mx + b
+            m = (point_1[1] - point_2[1]) / (point_1[0] - point_2[0])
+            b = -m * point_1[0] + point_1[1]
+            
+            # Check if each point fits into the line.
+            num_points = 0
+            for check_point in points:
+                if check_point[1] == (m*check_point[0] + b):
+                    num_points += 1
+            
+            max_points = max(max_points, num_points)
+    
+    return max_points
 
 
 # 16.15
