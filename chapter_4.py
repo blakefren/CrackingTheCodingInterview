@@ -374,7 +374,7 @@ def four_nine(root):
         while q_1:  # O(N) loop.
         
             q_1_sub = q_1.popleft()
-            for q_2:  # O(N) loop.
+            while q_2:  # O(N) loop.
                 
                 q_2_sub = q_2.popleft()
                 return_queue.extend(get_ordered_permutations(deque(node.value), q_1_sub, q_2_sub))
