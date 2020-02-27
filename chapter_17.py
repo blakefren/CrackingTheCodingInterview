@@ -86,13 +86,39 @@ def seventeen_four():
 
 
 # 17.5
-# Description
+# Given an array filled with letters and numbers, find the longest subarray with an equal number of letter and numbers.
 # 
-# This method has O() runtime, where _ = ____.
+# This method has O(n) runtime, where n = len(array).
 
-def seventeen_five():
+def seventeen_five(array):
     
-    pass
+    # Assume there are no non-letter or non-number chars in the array.
+    # ALso assume all letters are uppercase.
+
+    # Build list of net letter/number counts by index.
+    diff_count = [0] * len(array)
+    running_count = 0
+    for i in range(len(array)):
+        if ord('A') <= ord(array[i]) <= ord('Z'):
+            running_count += 1
+        else:
+            running_count -= 1
+        diff_count[i] = running_count
+    print(diff_count)
+    
+    # Find longest sequence starting and ending with the same diff.
+    subarray_dict = {0:-1}
+    start = 0
+    end = 0
+    for i in range(len(array)):
+        if diff_count[i] in subarray_dict:
+            if i-subarray_dict[diff_count[i]] > end-start:
+                start = subarray_dict[diff_count[i]]
+                end = i
+        else:
+            subarray_dict[diff_count[i]] = i
+
+    return array[start+1:end+1]
 
 
 # 17.6
@@ -245,23 +271,67 @@ def seventeen_nine(k):
 
 
 # 17.10
-# Description
+# Given an array of positive integers, find the majority element (the
+# element that takes up more than half of the array). If none, return -1.
+# Complete in O(n) time and O(1) space.
 # 
-# This method has O(____) runtime, where _ = ____.
+# This method has O(n) runtime, where n = len(array).
 
-def seventeen_ten():
+def seventeen_ten(array):
     
-    pass
+    last_val = -1
+    count = 0
+    for i in range(len(array)):
+        if count == 0:
+            last_val = array[i]
+        if array[i] == last_val:
+            count += 1
+        else:
+            count -= 1
+    
+    if array.count(last_val) > len(array) // 2:
+        return last_val
+    else:
+        return -1
 
 
 # 17.11
-# Description
+# Gien a large text file of words, find the shortest distance (by
+# word count) between any two words. Optimize for repeated queries.
 # 
-# This method has O(____) runtime, where _ = ____.
+# Storing the words is O(n) runtime, where n = len(words).
+# Finding the closest pair is O(w1 + w2) runtime, where w1 = number of 
+# word1 in words, and w2 = number of word2 in words.
 
-def seventeen_eleven():
+def seventeen_eleven(words, word1, word2):
     
-    pass
+    # words is an ordered list of the words from the file.
+
+    # For the optimized solution, assume we would be storing this dict
+    # somewhere in memory, or in a file for easy lookup.
+    word_dict = {}
+    for i, w in enumerate(words):
+        if w not in word_dict:
+            word_dict[w] = []
+        word_dict[w].append(i)
+    
+    # Of the locations, find the shortest distance.
+    # These lists are already ordered.
+    word1_loc = word_dict[word1]
+    word2_loc = word_dict[word2]
+    shortest_distance = len(words)
+    loc1 = 0
+    loc2 = 0
+
+    while loc1 < len(word1_loc) and loc2 < len(word2_loc):
+        if word1_loc[loc1] > word2_loc[loc2]:
+            shortest_distance = min(shortest_distance, loc1-loc2)
+            loc2 += 1
+        elif word2_loc[loc2] > word1_loc[loc1]:
+            shortest_distance = min(shortest_distance, loc2-loc1)
+            loc1 += 1
+    
+    return shortest_distance
 
 
 # 17.12
