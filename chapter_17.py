@@ -355,13 +355,50 @@ def seventeen_thirteen():
 
 
 # 17.14
-# Description
+# FInd the smallest k numbers in an array.
 # 
-# This method has O(____) runtime, where _ = ____.
+# This method has O(n) average runtime, where n = len(array).
 
-def seventeen_fourteen():
+def seventeen_fourteen(k, array):
     
-    pass
+    # Edge cases.
+    if k == len(array):
+        return array
+    if k == 0 or len(array) == 0:
+        return []
+    
+    return quick_sort_17_14(k, array)
+
+
+def quick_sort_17_14(k, array):
+    
+    if k == 0:
+        return []
+
+    # Set the pivot.
+    pivot = randint(0, len(array)-1)
+    lower = []
+    same = []
+    higher = []
+
+    # Perform sort.
+    for i in range(len(array)):
+        if array[i] < array[pivot]:
+            lower.append(array[i])
+        elif array[i] == array[pivot]:
+            same.append(array[i])
+        elif array[i] > array[pivot]:
+            higher.append(array[i])
+        
+    # Check for the k elements.
+    if k == len(lower):
+        return lower
+    elif k < len(lower):
+        return quick_sort_17_14(k, lower)
+    elif len(lower) < k < (len(lower)+len(same)):
+        return lower + same[:k-len(lower)]
+    else:
+        return lower + same + quick_sort_17_14(k-len(same)-len(lower), higher)
 
 
 # 17.15
@@ -369,17 +406,19 @@ def seventeen_fourteen():
 # 
 # This method has O(____) runtime, where _ = ____.
 
-def seventeen_fifteen():
+def seventeen_sixteen():
     
     pass
 
 
 # 17.16
-# Description
+# Given a list of back to back appointments, return the max amount of
+# time that a masseuse can work given a 15 minute break between each.
+# Each appt is a multiple of 15 minutes and does not overlap.
 # 
 # This method has O(____) runtime, where _ = ____.
 
-def seventeen_sixteen():
+def seventeen_sixteen(appointments):
     
     pass
 

@@ -809,13 +809,34 @@ def sixteen_twenty(dictionary, numeric_word):
 
 
 # 16.21
-# Description
+# Given two arrays of integers, find a value from each that, when
+# swapped, will give the arrays the same sum.
 # 
-# This method has O(____) runtime where N=____.
+# This method has O(a*log(a) + b*log(b)) runtime where a and b
+# are the lengths of the arrays.
 
-def sixteen_twentyone():
+def sixteen_twentyone(array1, array2):
     
-    pass
+    # Edge cases.
+    sum1 = sum(array1)
+    sum2 = sum(array2)
+    if sum1 == sum2 or len(array1) == 0 or len(array2) == 0:
+        return []
+    
+    array1 = sorted(array1)
+    array2 = sorted(array2)
+    sum_diff = sum1 - sum2
+    index1 = 0
+    index2 = 0
+
+    while index1 < len(array1) and index2 < len(array2):
+        diff = array1[index1] - array2[index2]
+        if (sum1-diff) == (sum2+diff):
+            return [array1[index1], array2[index2]]
+        elif diff < sum_diff:
+            index1 += 1
+        else:
+            index2 += 1
 
 
 # 16.22
@@ -962,4 +983,4 @@ def sixteen_twentysix(equation):
     # Iterate through the equation and run multiply and divide operations.
     for id in objects_by_num.keys():
         if objects_by_num[id] == '*':
-            
+            pass
