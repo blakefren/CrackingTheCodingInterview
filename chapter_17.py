@@ -5,6 +5,7 @@ Chapter Seventeen - Hard
 from random import randint
 from collections import deque
 import sys
+from heapq import heapify, heappop, heappush, nsmallest
 
 
 # 17.1
@@ -78,11 +79,36 @@ def seventeen_three(m, numbers):
 # You cannot access the entire array A with a single operation. You can access the jth bit of
 # the ith number in A using an assumed method.
 # 
-# This method has O() runtime, where _ = ____.
+# This method has O(n*log(n)) runtime, where n = len(A).
 
-def seventeen_four():
-
+def getJthBitofA(j, i):
+    # Assume this is implmemented.
     pass
+
+def seventeen_four(length_a):
+
+    # Assume the array is sorted.
+    # TODO
+
+    max_a = length_a-1
+    i = 0
+    
+    while True:
+        lsb_count = 0
+        for j in range(length_a):
+            lsb_count += getJthBitofA(0, j)
+        # if lsb_count
+
+
+
+    for i in range(length_a):
+        expected_num = str(bin(i))[2:][::-1]
+        for j in reversed(range(len(expected_num))):
+            print(i, expected_num, j, expected_num[j])
+            if int(expected_num[j]) != getJthBitofA(j, i):
+                return i
+
+# print(seventeen_four([_ for _ in range(9)] + [10]))  # TEMP
 
 
 # 17.5
@@ -335,13 +361,78 @@ def seventeen_eleven(words, word1, word2):
 
 
 # 17.12
-# Description
+# Given class BiNode and a binary search tree implemented with it,
+# change the BST to a doubly linked list in place. 
 # 
-# This method has O(____) runtime, where _ = ____.
+# This method has O(n) runtime, where n = num nodes.
 
-def seventeen_twelve():
+class BiNode:
+    def __init__(self, data:int, node1=None, node2=None):
+        self.data = data
+        self.node1 = node1
+        self.node2 = node2
+
+class BinarySearchTree:
+    def __init__(self, root:int=None):
+        self.root = BiNode(root)
     
-    pass
+    def insert(self, data:int):
+        
+        new_node = BiNode(data)
+
+        if self.root is None:
+            self.root = new_node
+            return
+
+        current_node = self.root
+        while current_node:
+            if new_node.data <= current_node.data:
+                if current_node.node1:
+                    current_node = current_node.node1
+                    continue
+                else:
+                    current_node.node1 = new_node
+                    break
+            else:  # Greater than current node.
+                if current_node.node2:
+                    current_node = current_node.node2
+                    continue
+                else:
+                    current_node.node2 = new_node
+                    break
+
+def recurse_tree(node:BiNode, prev_node:BiNode=None):
+    
+    if node is None:
+        return None, None
+
+    left_start, left_end = recurse_tree(node.node1, node)
+    right_start, right_end = recurse_tree(node.node2, node)
+    ll_start = None
+    ll_end = None
+
+    if left_start is None:  # No left subnode.
+        ll_start = node
+    else:
+        ll_start = left_start
+        node.node1 = left_end
+        left_end.node2 = node
+    
+    if right_start is None:  # No right subnode.
+        ll_end = node
+    else:
+        ll_end = right_end
+        node.node2 = right_start
+        right_start.node1 = node
+
+    return ll_start, ll_end
+
+def seventeen_twelve(bst_root_node):
+    
+    # Recursively touch each node and build the list bottom up.
+    ll_head, _ = recurse_tree(bst_root_node)
+
+    return ll_head
 
 
 # 17.13
@@ -454,13 +545,52 @@ def seventeen_nineteen():
 
 
 # 17.20
-# Description
+# Given a continuous random number generator, update and maintain
+# the median value of all passed values.
 # 
-# This method has O(____) runtime, where _ = ____.
+# Updating the median has O(log(n)) runtime, where n = num passed values.
 
-def seventeen_twenty():
+class seventeen_twenty:
     
-    pass
+    def __init__(self):
+        self.median = 0
+        self._max_heap = []
+        heapify(self._max_heap)
+        self._max_size = 0
+        self._min_heap = []  # Input all items as (-1*item)
+        heapify(self._min_heap)
+        self._min_size = 0
+
+    def add_num(self, value):
+        
+        # If no values, add the new value to the min heap.
+        if len(self._min_heap) == 0 and len(self._max_heap) == 0:
+            heappush(self._max_heap, value)
+
+        # Add value to one of the heaps.
+        if value <= self._max_heap[0]:  # Goes in max heap.
+            heappush(self._max_heap, value)
+            self._max_size = len(self._max_heap)
+        else:  # Goes in min heap.
+            heappush(self._min_heap, -1*value)
+            self._min_size = len(self._min_heap)
+
+        # Balance the heaps.
+        while abs(self._min_size - self._max_size) > 1:
+            if self._min_size > self._max_size:
+                heappush(self._max_heap, -1*heappop(self._min_heap))
+            else:
+                heappush(self._min_heap, -1*heappop(self._max_heap))
+            self._min_size -= len(self._min_heap)
+            self._min_size += len(self._max_heap)
+        
+        # Update the median.
+        if self._min_size == self._max_size:
+            self.median = (self._min_heap[0] + self._max_heap[0]) // 2
+        elif self._min_size == self._max_size + 1:
+            self.median = self._min_heap[0]
+        elif self._min_size + 1 == self._max_size:
+            self.median = self._max_heap[0]
 
 
 # 17.21
