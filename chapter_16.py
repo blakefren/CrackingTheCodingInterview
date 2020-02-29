@@ -5,6 +5,7 @@ Chapter Sixteen - Moderate
 import sys
 from collections import deque
 import math
+from random import randint
 
 
 # 16.1
@@ -62,8 +63,8 @@ def sixteen_three(start_1, end_1, start_2, end_2):
         return (a <= b <= c) or (a >= b >= c)
     
     # Compute slopes and y-intercepts.
-    m = (0, 0)
-    b = (0, 0)
+    m = [0, 0]
+    b = [0, 0]
     
     try:  # First line.
         m[0] = (end_1[1] - start_1[1]) / (end_1[0] - start_1[0])
@@ -80,7 +81,7 @@ def sixteen_three(start_1, end_1, start_2, end_2):
         b[1] = None
     
     # Compute intersection point.
-    inter_pt = (None, None)
+    inter_pt = [None, None]
     
     if m[0] == m[1]:  # Both lines are parallel or vertical.
         
@@ -226,7 +227,7 @@ class sixteen_five:
             self._num_zeros[i] = zero_count
             
     
-    def get_trailing_zeros(N):
+    def get_trailing_zeros(self, N):
         
         if N in self._num_zeros:
             return self._num_zeros[N]
@@ -372,10 +373,10 @@ class sixteen_nine:
     
         total = 0
         if b > 0:
-            for i in range(b):
+            for _ in range(b):
                 total += a
         else:
-            for i in range(a):
+            for _ in range(a):
                 total += b
             
         return total
@@ -385,7 +386,7 @@ class sixteen_nine:
     def divide(a, b):  # TODO: negative numbers
         counter = -1
         while a > 0:
-            a += subtract(a, b)
+            a += sixteen_nine.subtract(a, b)
             counter += 1
         return counter
 
@@ -404,8 +405,8 @@ def sixteen_ten(people, start_year, end_year):
     year_changes = {year:0 for year in range(start_year, end_year+2)}  # O(M) initialization.
     
     for person in people:  # O(N) loop.
-        year_changes[people[0]] += 1
-        year_changes[people[1]+1] -= 1  # Need the plus one because the person isn't gone until the next year.
+        year_changes[person[0]] += 1
+        year_changes[person[1]+1] -= 1  # Need the plus one because the person isn't gone until the next year.
     
     sum = 0
     max_people = 0
@@ -461,8 +462,8 @@ class Square:
     def __init__(self, ll_x, ll_y, ul_x, ul_y, ur_x, ur_y, lr_x, lr_y):
         
         # Assume we have some checks here to make sure the points make a square.
-        if (not_a_square):
-            raise ValueError
+        # if (not_a_square):
+            # raise ValueError
         
         # All the X/Y coords for the points of the square.    
         self.ll_x = ll_x
@@ -478,7 +479,7 @@ class Square:
         self.side_len = math.sqrt((ll_x - ul_x)**2 + (ll_y - ul_y)**2)
         
         # Get area,
-        self.area = self.line_len ** 2
+        self.area = self.side_len ** 2
 
 def sixteen_thirteen(square_1, square_2):
     
@@ -825,7 +826,6 @@ def sixteen_twentyone(array1, array2):
     
     array1 = sorted(array1)
     array2 = sorted(array2)
-    sum_diff = sum1 - sum2
     index1 = 0
     index2 = 0
 
@@ -833,30 +833,93 @@ def sixteen_twentyone(array1, array2):
         diff = array1[index1] - array2[index2]
         if (sum1-diff) == (sum2+diff):
             return [array1[index1], array2[index2]]
-        elif diff < sum_diff:
+        elif diff < (sum1 - sum2):
             index1 += 1
         else:
             index2 += 1
 
 
 # 16.22
-# Description
+# For an infinite grid of black and white squares, find the grid's
+# layout after the first k moves for an ant if:
+# 1 - the ant begins facing to the right.
+# 2 - all square start as white
+# 3 - when the ant step on a white square, it changes it to black, turns
+# 90 degrees clockwise, and moves one square forward
+# 4 - when the ant step on a black square, it changes it to white, turns
+# 90 degrees counter-clockwise, and moves one square forward
 # 
-# This method has O(____) runtime where N=____.
+# This method has O(k) runtime.
 
-def sixteen_twentytwo():
+def sixteen_twentytwo(k):
     
-    pass
+    # Create the "grid" - just a history of where 
+    # the ant has gone.
+    grid = {}
+    ant_loc = [0, 0]  # x, y location
+    ant_dir = 0  # direction (degrees)
+    grid[tuple(ant_loc)] = 0  # 0 is white, 1 is black
+
+    dir_change = {
+        0: [1, 0],
+        90: [0, -1],
+        180: [-1, 0],
+        270: [0, 1]}
+    next_dir = {
+        0: 90,
+        1: -90}
+    bounds = [[0, 0], [0, 0]]  # min_x, max_x, min_y, min_y
+
+    for _ in range(k):
+
+        # Get current grid color and update.
+        loc_tuple = tuple(ant_loc)
+        square_color = grid[loc_tuple]
+        grid[loc_tuple] = 1 if square_color==0 else 0
+        
+        # Update the ant's direction and position.
+        ant_dir = (ant_dir + next_dir[square_color]) % 360
+        ant_loc[0] += dir_change[ant_dir][0]
+        ant_loc[1] += dir_change[ant_dir][1]
+
+        # Add the new position to the grid.
+        loc_tuple = tuple(ant_loc)
+        if loc_tuple not in grid:
+            grid[loc_tuple] = 0
+
+        # Update bounds.
+        bounds[0][0] = min(bounds[0][0], ant_loc[0])
+        bounds[0][1] = max(bounds[0][1], ant_loc[0])
+        bounds[1][0] = min(bounds[1][0], ant_loc[1])
+        bounds[1][1] = max(bounds[1][1], ant_loc[1])
+    
+    # Print the completed grid.
+    translation = {0:'_', 1:'X'}
+    for y in range(bounds[1][1], bounds[1][0]-1, -1):
+
+        print_str = []
+        for x in range(bounds[0][0], bounds[0][1]+1):
+            print_str.append(translation[grid.get((x, y), 0)])
+        print(''.join(print_str))
 
 
 # 16.23
-# Description
-# 
-# This method has O(____) runtime where N=____.
+# Given a method rand5 (0-4), implement rand7 (0-6).
+
+def rand5():
+    return randint(0, 4)
+
+def rand7():
+    while True:
+        num = rand5() + rand5()
+        if num < 7:
+            return num
 
 def sixteen_twentythree():
+    return rand7()
+
+print(sixteen_twentythree())
     
-    pass
 
 
 # 16.24
@@ -903,7 +966,7 @@ class sixteen_twentyfive:
         self._dict = {}
         self._last_use = {}
     
-    def insert_value(key, value):
+    def insert_value(self, key, value):
         
         # Remove an item if needed, otherwise increment size by one.
         if self._current_size == self._max_size:  # Remove least recently used item.
@@ -917,7 +980,7 @@ class sixteen_twentyfive:
         self._dict[key] = value
         self._last_use[key] = datetime.datetime.now()
     
-    def remove_value(key):
+    def remove_value(self, key):
         try:
             if key in self._dict:
                 del self._dict[key]
@@ -927,7 +990,7 @@ class sixteen_twentyfive:
         except:
             return False
     
-    def get_value(key):
+    def get_value(self, key):
         self._last_use[key] = datetime.datetime.now()
         return self._dict.get(key, None)
 

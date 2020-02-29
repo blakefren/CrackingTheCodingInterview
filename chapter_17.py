@@ -406,7 +406,7 @@ def quick_sort_17_14(k, array):
 # 
 # This method has O(____) runtime, where _ = ____.
 
-def seventeen_sixteen():
+def seventeen_fifteen():
     
     pass
 
